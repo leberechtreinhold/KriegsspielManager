@@ -48,3 +48,5 @@ sysinfo.txt
 crashlytics-build.properties
 .vscode/settings.json
 Assets/Plugins
+UserSettings/Search.settings
+.vsconfig
