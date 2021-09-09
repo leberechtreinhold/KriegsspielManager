@@ -5,17 +5,14 @@ using UnityEngine;
 
 public class ScenarioLoader : MonoBehaviour
 {
-    // Start is called before the first frame update
+    ScenarioSetup Current = null;
+
     void Start()
     {
-        var scenario = ScenarioSetup.GetTestScenario();
-        LoadSprite("Map", scenario.MapImagePath, scenario.WidthMapMeters);
-        var camera = Camera.main;
-        float half_width = (float)scenario.WidthMapMeters / 2;
-        camera.orthographicSize = half_width;
-        camera.transform.SetPositionAndRotation(new Vector3(half_width, half_width, -10), Quaternion.identity);
+        Current = ScenarioSetup.GetTestScenario();
+        LoadSprite("Map", Current.MapImagePath, Current.WidthMapMeters);
 
-        camera.GetComponent<CameraControl>().MAX_SPEED = (float)scenario.WidthMapMeters / 10;
+        Camera.main.gameObject.GetComponent<CameraControl>().OnLoadScenario(Current);
     }
 
     public void LoadSprite(string name, string file_path, double width_meters)
@@ -34,7 +31,6 @@ public class ScenarioLoader : MonoBehaviour
                 game_obj.name = name;
                 var sprite_renderer = game_obj.AddComponent<SpriteRenderer>();
                 sprite_renderer.sprite = sprite;
-
             }
         }
     }

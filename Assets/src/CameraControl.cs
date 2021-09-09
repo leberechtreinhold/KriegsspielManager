@@ -1,14 +1,35 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraControl : MonoBehaviour
 {
-    public const float SPEED = 100;
-    public const float ACCELERATION = 1.05f;
-    public float MAX_SPEED { get; set; } = SPEED * 10;
+    public float MoveSpeed { get; private set; }
+    public float MoveAcceleration { get; private set; }
+    public float MoveMaxSpeed { get; private set; }
 
-    float CurrentSpeed = SPEED;
+    public float ZoomSpeed { get; set; }
+
+    float MoveCurrentSpeed;
+    ScenarioSetup Scenario;
+    new Camera camera;
+    
+    public void OnLoadScenario(ScenarioSetup loaded_scenario)
+    {
+        Scenario = loaded_scenario;
+        camera = Camera.main;
+        float half_width = (float)Scenario.WidthMapMeters / 2;
+        camera.orthographicSize = half_width;
+        camera.transform.SetPositionAndRotation(new Vector3(half_width, half_width, -10), Quaternion.identity);
+
+        MoveSpeed = (float)Scenario.WidthMapMeters / 100;
+        MoveAcceleration = MoveSpeed / 50;
+        MoveMaxSpeed = (float)Scenario.WidthMapMeters / 5;
+        MoveCurrentSpeed = MoveSpeed;
+        
+        ZoomSpeed = (float)Scenario.WidthMapMeters * 2;
+    }
 
     void Update()
     {
@@ -33,17 +54,23 @@ public class CameraControl : MonoBehaviour
             movement_pressed = true;
             MoveCamera(DIRECTION.LEFT);
         }
+        if (Math.Abs(Input.mouseScrollDelta.y) > 0f)
+        {
+            ZoomCamera(Input.mouseScrollDelta.y > 0f ? ZOOM.IN : ZOOM.OUT);
+        }
+
         if (!movement_pressed)
         {
-            CurrentSpeed = SPEED;
+            MoveCurrentSpeed = MoveSpeed;
         }
         else
         {
-            CurrentSpeed = CurrentSpeed * ACCELERATION;
-            if (CurrentSpeed > MAX_SPEED)
+            MoveCurrentSpeed = MoveCurrentSpeed * (1 + Time.deltaTime * MoveAcceleration);
+            if (MoveCurrentSpeed > MoveMaxSpeed)
             {
-                CurrentSpeed = MAX_SPEED;
+                MoveCurrentSpeed = MoveMaxSpeed;
             }
+            Debug.Log(MoveCurrentSpeed);
         }
     }
 
@@ -51,20 +78,25 @@ public class CameraControl : MonoBehaviour
     {
         if (dir == DIRECTION.UP)
         {
-            transform.Translate(transform.up * Time.deltaTime * CurrentSpeed);
+            transform.Translate(transform.up * Time.deltaTime * MoveCurrentSpeed);
         }
         else if (dir == DIRECTION.RIGHT)
         {
-            transform.Translate(transform.right * Time.deltaTime * CurrentSpeed);
+            transform.Translate(transform.right * Time.deltaTime * MoveCurrentSpeed);
         }
         else if (dir == DIRECTION.BOTTOM)
         {
-            transform.Translate(-transform.up * Time.deltaTime * CurrentSpeed);
+            transform.Translate(-transform.up * Time.deltaTime * MoveCurrentSpeed);
         }
         else if (dir == DIRECTION.LEFT)
         {
-            transform.Translate(-transform.right * Time.deltaTime * CurrentSpeed);
+            transform.Translate(-transform.right * Time.deltaTime * MoveCurrentSpeed);
         }
+    }
+
+    void ZoomCamera(ZOOM dir)
+    {
+        camera.orthographicSize += (int)dir * Time.deltaTime * ZoomSpeed;
     }
 }
 
@@ -74,4 +106,10 @@ public enum DIRECTION
     RIGHT = 1,
     BOTTOM = 2,
     LEFT = 3
+}
+
+public enum ZOOM
+{
+    IN = -1,
+    OUT = 1
 }
