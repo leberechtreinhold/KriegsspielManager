@@ -14,6 +14,8 @@ public class ScenarioLoader : MonoBehaviour
         float half_width = (float)scenario.WidthMapMeters / 2;
         camera.orthographicSize = half_width;
         camera.transform.SetPositionAndRotation(new Vector3(half_width, half_width, -10), Quaternion.identity);
+
+        camera.GetComponent<CameraControl>().MAX_SPEED = (float)scenario.WidthMapMeters / 10;
     }
 
     public void LoadSprite(string name, string file_path, double width_meters)
