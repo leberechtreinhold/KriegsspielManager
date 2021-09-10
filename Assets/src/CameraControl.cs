@@ -15,7 +15,7 @@ public class CameraControl : MonoBehaviour
     float MoveCurrentSpeed;
     ScenarioSetup Scenario;
     new Camera camera;
-    
+
     public void OnLoadScenario(ScenarioSetup loaded_scenario)
     {
         Scenario = loaded_scenario;
@@ -28,7 +28,7 @@ public class CameraControl : MonoBehaviour
         MoveAcceleration = MoveSpeed / 30;
         MoveMaxSpeed = (float)Scenario.WidthMapMeters / 5;
         MoveCurrentSpeed = MoveSpeed;
-        
+
         ZoomSpeed = (float)Scenario.WidthMapMeters * 3;
         RotationSpeed = 30;
     }
@@ -74,7 +74,7 @@ public class CameraControl : MonoBehaviour
         {
             ZoomCamera(Input.mouseScrollDelta.y > 0f ? ZOOM.IN : ZOOM.OUT);
         }
-        
+
         if (Input.GetKey(KeyCode.Q))
         {
             RotateCamera(ROTATION.CLOCKWISE);
